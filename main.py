@@ -5,6 +5,7 @@ import psycopg2
 def updateadminpass(hashedpass):
     dbname = input("Nombre de la DB: ")
     user = input("Usuario (postgres): ") or "postgres"
+    userid = input("Id de usuario en la db (default 2): ") or "2"
     passw = input("Contraseña: ")
     conn = psycopg2.connect(
         host="localhost",
@@ -12,8 +13,13 @@ def updateadminpass(hashedpass):
         user=user,
         password=passw)
     cursor = conn.cursor()
-    sql = "UPDATE res_users SET password='" + hashedpass + "' WHERE id=2;"
+    sql = "UPDATE res_users SET password='" + hashedpass +"' WHERE id=" + userid + ";"
     cursor.execute(sql)
+    sql2 = "SELECT login FROM res_users WHERE id=%s" % (userid)
+    cursor.execute(sql2)
+    result = cursor.fetchall()
+    for l in result:
+        print(l[0])
     conn.commit()
     cursor.close()
     conn.close()
@@ -26,4 +32,5 @@ def hashpasswd():
 
 
 if __name__ == '__main__':
+    # print(hashpasswd())
     updateadminpass(hashpasswd())
